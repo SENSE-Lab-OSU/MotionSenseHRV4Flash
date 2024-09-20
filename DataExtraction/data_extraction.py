@@ -1,3 +1,4 @@
+# %%
 import os
 import struct
 import re
@@ -77,15 +78,8 @@ def process_data(data, categories: list[list], format: list, use_check=False) ->
     print("errors: " + str(errors))
     return errors
 
-
-
-
-
-
 def file_sort(element1):
     return int(re.sub("\D", "", element1))
-
-
 
 def gather_files_by_prefix(prefix:str, path):
     all_files = []
@@ -95,7 +89,6 @@ def gather_files_by_prefix(prefix:str, path):
             all_files.append(file)
     all_files.sort(key=file_sort)
     return all_files
-
 
 def collect_all_data_by_prefix(path, prefix:str, labels:list[str], types:list[str]):
     total_errors = 0
@@ -114,25 +107,24 @@ def collect_all_data_by_prefix(path, prefix:str, labels:list[str], types:list[st
     for index in range(len(labels)):
         full_dict[labels[index]] = all_data[index]
 
-    dataset = pd.DataFrame(full_dict)
-    
+    dataset = pd.DataFrame(dict([(k,pd.Series(v)) for k,v in full_dict.items() ]))
     return dataset
-
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #files = os.listdir()
-    path = "G:/"
-    ppg_labels = ["g1", "g2", "ir1", "ir2", "counter"]
-
+    path = r".\data\MSense4Right1\\"
+    
     acc_labels = ["AccX", "AccY", "AccZ", "GyroX", "GyroY", "GyroZ", "Counter", "ENMO"]
     acc_formats = ["<h", "<h", "<h", "<h", "<h", "<h", "<H", "<f"]
-    #data_set = collect_all_data_by_prefix(path, "ppg", ppg_labels)
     accel_data_set = collect_all_data_by_prefix(path, "ac", acc_labels, acc_formats)
     accel_data_set.to_csv("acceleration.csv")
 
-
+    ppg_labels = ["g1", "g2", "ir1", "ir2", "counter"]
+    ppg_formats = ["<h", "<h", "<h", "<h", "<H"]
+    data_set = collect_all_data_by_prefix(path, "ppg", ppg_labels, ppg_formats)
+    data_set.to_csv("ppg.csv")
 
     graph_generation.pd_graph_generation("ppg", accel_data_set)
     # then save it as a csv
